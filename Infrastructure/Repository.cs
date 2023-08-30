@@ -47,24 +47,24 @@ public class Repository
     /**
      * A method used for test #3 get Full article
      */
-    public IEnumerable<Article> getFullArticle(Article article)
+    public Article getFullArticle(int articleId)
     {
-        var sql = $@"SELECT * FROM news.articles;";
+        var sql = $@"SELECT * FROM news.articles WHERE articleid = @articleId;";
         using (var conn = _dataSource.OpenConnection())
         {
-            return conn.Query<Article>(sql);
+            return conn.QueryFirst<Article>(sql, new {articleId});
         }
     }
 
     /**
      * A method used for test #4 delete article
      */
-    public object DeleteArticle(int articleId)
+    public void DeleteArticle(int articleId)
     {
-        var sql = $@"DELETE FROM news.articles WHERE articleId = @articleId;";
+        var sql = $@"DELETE FROM news.articles WHERE articleid = @articleId;";
         using (var conn = _dataSource.OpenConnection())
         {
-            return conn.Execute(sql, new { articleId }) == 1;
+            conn.Execute(sql, new { articleId });
         }
     }
 
@@ -74,7 +74,7 @@ public class Repository
 
     public Article UpdateArticle(Article article, int articleId)
     {
-        var sql = $@"UPDATE news.articles SET headline = @headline, body = @body, author = @author articleimgurl = @articleimgurl 
+        var sql = $@"UPDATE news.articles SET headline = @headline, body = @body, author = @author, articleimgurl = @articleimgurl 
                      WHERE articleid = @articleId RETURNING *;";
         if (validAuthors.Contains(article.author))
         {

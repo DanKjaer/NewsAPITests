@@ -38,10 +38,10 @@ public class ArticleController : ControllerBase
      * A method used for the get full article or test #3
      */
     [HttpGet]
-    [Route("/api/articles/")]
-    public IEnumerable<Article> GetFullArticle(Article article)
+    [Route("/api/articles/{articleId}")]
+    public Article GetFullArticle([FromRoute]int articleId)
     {
-        return _service.getFullArticle(article);
+        return _service.getFullArticle(articleId);
     }
 
     /**
@@ -49,9 +49,9 @@ public class ArticleController : ControllerBase
      */
     [HttpDelete]
     [Route("/api/articles/{articleId}")]
-    public object DeleteArticle([FromRoute] int articleId)
+    public void DeleteArticle([FromRoute] int articleId)
     {
-        return _service.deleteArticle(articleId);
+        _service.deleteArticle(articleId);
     }
 
     /**

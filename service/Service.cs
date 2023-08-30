@@ -1,17 +1,20 @@
 ﻿using Infrastructure;
 using Infrastructure.models;
+using Microsoft.Extensions.Logging;
 
 namespace service;
 
 public class Service
 {
     private readonly Repository _repository;
+    private readonly ILogger<Service> _logger;
 
-    public Service(Repository repository)
+    public Service(Repository repository, ILogger<Service> logger)
     {
+        _logger = logger;
         _repository = repository;
     }
-
+    
     public Article createArticle(Article article)
     {
         try
@@ -40,25 +43,24 @@ public class Service
         }
     }
 
-    public IEnumerable<Article> getFullArticle(Article article)
+    public Article getFullArticle(int articleId)
     {
         try
         {
-            return _repository.getFullArticle(article);
+            return _repository.getFullArticle(articleId);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            Console.WriteLine(e.InnerException);
+            _logger.LogWarning(e.Message,e.InnerException);
             throw new Exception("could not get full article");
         }
     }
 
-    public object deleteArticle(int articleId)
+    public void deleteArticle(int articleId)
     {
         try
         {
-            return _repository.DeleteArticle(articleId);
+            _repository.DeleteArticle(articleId);
         }
         catch (Exception e)
         {
