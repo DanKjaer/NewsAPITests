@@ -1,4 +1,5 @@
-﻿using Infrastructure.models;
+﻿using System.ComponentModel.DataAnnotations;
+using Infrastructure.models;
 using Microsoft.AspNetCore.Mvc;
 using service;
 
@@ -62,5 +63,12 @@ public class ArticleController : ControllerBase
     public Article UpdateArticle([FromBody] Article article, [FromRoute] int articleId)
     {
         return _service.UpdateArticle(article, articleId);
+    }
+
+    [HttpGet]
+    [Route("/api/articles")]
+    public IEnumerable<SearchArticleItem> searchArticle([FromQuery][MinLength(3)] string searchTerm, [FromQuery] int pageSize)
+    {
+        return _service.searchArticle(searchTerm, pageSize);
     }
 }

@@ -84,11 +84,11 @@ public class Service
         }
     }
 
-    public Article SearchArticle(Article article)
+    public IEnumerable<SearchArticleItem> searchArticle(string searchTerm, int pageSize)
     {
         try
         {
-            return _repository.searchArticle(article);
+            return _repository.searchArticle(searchTerm, pageSize);
         }
         catch (Exception e)
         {

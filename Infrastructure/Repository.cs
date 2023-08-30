@@ -6,7 +6,6 @@ namespace Infrastructure;
 
 public class Repository
 {
-    private readonly string[] validAuthors = { "Bob", "Rob", "Dob", "Lob" };
     private readonly NpgsqlDataSource _dataSource;
 
     public Repository(NpgsqlDataSource datasource)
@@ -19,17 +18,12 @@ public class Repository
      */
     public Article CreateArticle(Article article)
     {
-        if (validAuthors.Contains(article.author))
-        {
             var sql = $@"INSERT INTO news.articles (headline, body, author, articleimgurl)
                     VALUES (@headline, @body, @author, @articleImgUrl) RETURNING *;";
             using (var conn = _dataSource.OpenConnection())
             {
                 return conn.QueryFirst<Article>(sql, article);
             }
-        }
-
-        throw new Exception("Invalid authors");
     }
     
     /**
@@ -76,25 +70,27 @@ public class Repository
     {
         var sql = $@"UPDATE news.articles SET headline = @headline, body = @body, author = @author, articleimgurl = @articleimgurl 
                      WHERE articleid = @articleId RETURNING *;";
-        if (validAuthors.Contains(article.author))
-        {
+
             using (var conn = _dataSource.OpenConnection())
             {
                 return conn.QueryFirst<Article>(sql,
                     new { article.headline, article.body, article.author, article.articleImgUrl, articleId });
-            } 
-        }
-
-        throw new Exception("Could not update article");
-
+            }
     }
 
     /**
      * A method used for test #6 Search article
      */
 
-    public Article searchArticle(Article article)
+    public IEnumerable<SearchArticleItem> searchArticle(string searchTerm, int pageSize)
     {
-        throw new NotImplementedException();
+        var sql = $@"SELECT * FROM news.articles WHERE 
+                                body LIKE '%' || @searchTerm || '%'
+                                OR headline LIKE '%' || @searchTerm || '%'
+                                LIMIT @pageSize;";
+        using (var conn = _dataSource.OpenConnection())
+        {
+            return conn.Query<SearchArticleItem>(sql, new { searchTerm, pageSize });
+        }
     }
 }
